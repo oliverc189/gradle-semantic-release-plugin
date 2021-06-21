@@ -24,7 +24,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 class UpdateGithubRelease extends DefaultTask {
-
+    private boolean isPrerelease = false
     private final Logger logger = Logging.getLogger(getClass())
 
     UpdateGithubRelease() {
@@ -45,6 +45,11 @@ class UpdateGithubRelease extends DefaultTask {
     }
 
     @Input
+    void isPrerelease(boolean isPrerelease){
+        this.isPrerelease = isPrerelease;
+    }
+
+    @Input
     Collection<Asset> getReleaseAssets() {
         return repo.releaseAssets
     }
@@ -61,6 +66,6 @@ class UpdateGithubRelease extends DefaultTask {
 
     @TaskAction
     void updateGithubRelease() {
-        new UpdateGithubReleaseService().updateGithubRelease(changeLog, repo, version, tagName)
+        new UpdateGithubReleaseService().updateGithubRelease(changeLog, repo, version, tagName, isPrerelease)
     }
 }

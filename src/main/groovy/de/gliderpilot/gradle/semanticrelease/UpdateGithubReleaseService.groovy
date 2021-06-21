@@ -33,9 +33,16 @@ class UpdateGithubReleaseService {
     private final Logger logger = Logging.getLogger(getClass())
 
     void updateGithubRelease(SemanticReleaseChangeLogService changeLog,
+                             GithubRepo githubRepo,
+                             ReleaseVersion version,
+                             String tagName) {
+        updateGithubRelease(changeLog, githubRepo, version, tagName, false)
+    }
+    void updateGithubRelease(SemanticReleaseChangeLogService changeLog,
             GithubRepo githubRepo,
             ReleaseVersion version,
-            String tagName) {
+            String tagName,
+            boolean isPrerelease) {
         Repo repo = githubRepo.github.repos().get(new Coordinates.Simple(githubRepo.mnemo))
 
         // check for the existance of the tag using the api -> #3
@@ -47,6 +54,7 @@ class UpdateGithubReleaseService {
         def commits = changeLog.commits(Version.valueOf(version.previousVersion))
 
         Release uploadGate = new Release.Smart(release)
+        uploadGate.prerelease(isPrerelease)
         uploadGate.body(changeLog.changeLog(commits, version).toString())
 
         def releaseAssets
